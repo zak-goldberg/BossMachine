@@ -1,5 +1,56 @@
 const express = require('express');
+
+// Create minionsRouter
 const minionsRouter = express.Router();
+
+// Create a new stream to write to file in this directory
+const fs = require('fs');
+const path = require('path');
+const minionLogStream = fs.createWriteStream(path.join(__dirname, 'logs', 'minion-logs.txt'), { flags: 'a' });
+
+// Require in morgan
+const morgan = require('morgan');
+
+// Create a custom token for response body
+morgan.token('response-body', function (req, res) {
+  if (res.body) {
+    return JSON.stringify(res.body);
+  } else {
+    return '-';
+  }
+});
+
+// Create a custom format string that includes the response body
+const logFormat = ':method :url :status :response-time ms - :res[content-length] :response-body';
+
+// Use the custom format in morgan
+const logger = morgan(logFormat, { stream: minionLogStream });
+
+// Middleware to capture the response body
+function captureResponseBody(req, res, next) {
+  const oldWrite = res.write;
+  const oldEnd = res.end;
+  const chunks = [];
+
+  res.write = function (chunk) {
+    chunks.push(chunk);
+    oldWrite.apply(res, arguments);
+  };
+
+  res.end = function (chunk) {
+    if (chunk) {
+      chunks.push(chunk);
+    }
+    res.body = Buffer.concat(chunks).toString('utf8');
+    oldEnd.apply(res, arguments);
+  };
+
+  next();
+}
+
+// Configure minionsRouter to capture response body and log each response
+minionsRouter.use(captureResponseBody);
+minionsRouter.use(logger);
 
 // Import database helper functions
 const { getAllFromDatabase
@@ -66,7 +117,7 @@ minionsRouter.delete('/:minionId', (req, res, next) => {
 });
 
 // Generic error handler
-app.use((err, req, res, next) => {
+minionsRouter.use((err, req, res, next) => {
   res.status(400).res.send(err.message);
 });
 
