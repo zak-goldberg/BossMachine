@@ -10,47 +10,7 @@ const minionLogStream = fs.createWriteStream(path.join(__dirname, 'logs', 'minio
 
 // Require in morgan
 const morgan = require('morgan');
-
-// Create a custom token for response body
-morgan.token('response-body', function (req, res) {
-  if (res.body) {
-    return JSON.stringify(res.body);
-  } else {
-    return '-';
-  }
-});
-
-// Create a custom format string that includes the response body
-const logFormat = ':method :url :status :response-time ms - :res[content-length] :response-body';
-
-// Use the custom format in morgan
-const logger = morgan(logFormat, { stream: minionLogStream });
-
-// Middleware to capture the response body
-function captureResponseBody(req, res, next) {
-  const oldWrite = res.write;
-  const oldEnd = res.end;
-  const chunks = [];
-
-  res.write = function (chunk) {
-    chunks.push(chunk);
-    oldWrite.apply(res, arguments);
-  };
-
-  res.end = function (chunk) {
-    if (chunk) {
-      chunks.push(chunk);
-    }
-    res.body = Buffer.concat(chunks).toString('utf8');
-    oldEnd.apply(res, arguments);
-  };
-
-  next();
-}
-
-// Configure minionsRouter to capture response body and log each response
-minionsRouter.use(captureResponseBody);
-minionsRouter.use(logger);
+minionsRouter.use(morgan('common', { stream: minionLogStream }));
 
 // Import database helper functions
 const { getAllFromDatabase
@@ -71,12 +31,14 @@ minionsRouter.get('/', (req, res, next) => {
 // Schema & data types are validated by addToDatabase() function.
 minionsRouter.post('/', (req, res, next) => {
   const newMinionPayload = req.body;
+  minionLogStream.write(`newMinionPayload: ${JSON.stringify(newMinionPayload)} \n`);
   try {
     const newMinion = addToDatabase('minions', newMinionPayload);
+    minionLogStream.write(`newMinion: ${JSON.stringify(newMinion)} \n`);
+    res.status(201).send(newMinion);
   } catch(err) {
     return next(err);
   }
-  res.send(newMinion);
 });
 
 // Middleware function to check if provided minionId exists and throw an error if not
@@ -99,11 +61,11 @@ minionsRouter.get('/:minionId', (req, res, next) => {
 // PUT /api/minions/:minionId to update a single minion by id.
 minionsRouter.put('/:minionId', (req, res, next) => {
   try {
-    const updatedMinion = updateInstanceInDatabase('minions', req.requestedMinion);
+    const updatedMinion = updateInstanceInDatabase('minions', req.body);
+    res.send(updatedMinion);
   } catch(err){
     return next(err);
   }
-  res.send(updatedMinion);
 });
 
 // DELETE /api/minions/:minionId to delete a single minion by id.
@@ -118,7 +80,8 @@ minionsRouter.delete('/:minionId', (req, res, next) => {
 
 // Generic error handler
 minionsRouter.use((err, req, res, next) => {
-  res.status(400).res.send(err.message);
+  minionLogStream.write(`${err.name}: ${err.message} \n${err.fileName}: ${err.lineNumber} \n`);
+  res.status(404).send(err.message);
 });
 
 module.exports = minionsRouter;
