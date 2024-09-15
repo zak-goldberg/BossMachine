@@ -56,6 +56,14 @@ minionsRouter.put('/:minionId', (req, res, next) => {
 });
 
 // DELETE /api/minions/:minionId to delete a single minion by id.
+minionsRouter.delete('/:minionId', (req, res, next) => {
+  const deletedMinion = deleteFromDatabasebyId('minions', req.minionId);
+  if (deletedMinion) {
+    res.status(204).send();
+  } else {
+    next(new Error('Please enter a valid minionId'));
+  }
+});
 
 // Generic error handler
 app.use((err, req, res, next) => {
