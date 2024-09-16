@@ -1,3 +1,4 @@
+// TO-DO: improve comments
 // Import database helper functions
 const { getAllFromDatabase
     , getFromDatabaseById

@@ -32,7 +32,7 @@ minionsRouter.param('minionId', checkIfValidItem('minions'));
 
 // GET /api/minions/:minionId to get a single minion by id.
 minionsRouter.get('/:minionId', (req, res, next) => { 
-  res.send(req.requestedMinion);
+  res.send(req.requestedItem);
 });
 
 // PUT /api/minions/:minionId to update a single minion by id.

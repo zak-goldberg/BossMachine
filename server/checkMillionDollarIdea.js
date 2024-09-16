@@ -5,12 +5,17 @@
 
 const checkMillionDollarIdea = (req, res, next) => {
     const newIdeaPayload = req.body;
-    if (newIdeaPayload.numWeeks && newIdeaPayload.weeklyRevenue) {
+    if (newIdeaPayload.numWeeks 
+        && newIdeaPayload.weeklyRevenue 
+        && typeof Number(newIdeaPayload.numWeeks) !== NaN
+        && typeof Number(newIdeaPayload.weeklyRevenue) !== NaN) {
         const ideaValue = Number(newIdeaPayload.numWeeks) * Number(newIdeaPayload.weeklyRevenue);
         if (ideaValue >= 1000000) return next();
-        return next(new Error('Please enter an idea worth greater than or equal to $1MM.'));
+        const valueError = new Error('Please enter an idea worth greater than or equal to $1MM.');
+        res.status(400).send(valueError.message);
     } else {
-        return next(new Error('Please enter a valid numWeeks and weeklyRevenue for the idea.'));
+        const validationError = new Error('Please enter valid numbers for numWeeks and weeklyRevenue for the idea.');
+        res.status(400).send(validationError.message);
     }
 };
 
