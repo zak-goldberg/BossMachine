@@ -21,10 +21,33 @@ const { getAllFromDatabase
     , deleteAllFromDatabase } 
     = require('./db.js');
 
+// Import checkMillionDollarIdea middleware function
+const checkMillionDollarIdea = require('./checkMillionDollarIdea.js');
+
 // GET /api/ideas to get an array of all ideas.
+ideasRouter.get('/', (req, res, next) => {
+    const ideasArray = getAllFromDatabase('ideas');
+    res.send(ideasArray);
+  });
+
 // POST /api/ideas to create a new idea and save it to the database.
+// Schema & data types are validated by addToDatabase() function.
+ideasRouter.post('/', checkMillionDollarIdea, (req, res, next) => {
+    const newIdeaPayload = req.body;
+    try {
+      const newIdea = addToDatabase('ideas', newIdeaPayload);
+      ideasLogStream.write(`newIdea: ${JSON.stringify(newIdea)} \n`);
+      res.status(201).send(newIdea);
+    } catch(err) {
+      return next(err);
+    }
+  });
+
 // GET /api/ideas/:ideaId to get a single idea by id.
+
 // PUT /api/ideas/:ideaId to update a single idea by id.
+// use checkMillionDollarIdea
+
 // DELETE /api/ideas/:ideaId to delete a single idea by id.
 
 // Generic error handler
