@@ -21,11 +21,11 @@ const { getAllFromDatabase
     , deleteAllFromDatabase } 
     = require('./db.js');
 
+// Import route factories
+const { getAllFactory } = require('./route-factories.js');
+
 // GET /api/minions to get an array of all minions.
-minionsRouter.get('/', (req, res, next) => {
-  const minionsArray = getAllFromDatabase('minions');
-  res.send(minionsArray);
-});
+minionsRouter.get('/', getAllFactory('minions'));
 
 // POST /api/minions to create a new minion and save it to the database.
 // Schema & data types are validated by addToDatabase() function.

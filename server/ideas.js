@@ -21,14 +21,14 @@ const { getAllFromDatabase
     , deleteAllFromDatabase } 
     = require('./db.js');
 
+// Import route factories
+const { getAllFactory } = require('./route-factories.js');
+
 // Import checkMillionDollarIdea middleware function
 const checkMillionDollarIdea = require('./checkMillionDollarIdea.js');
 
 // GET /api/ideas to get an array of all ideas.
-ideasRouter.get('/', (req, res, next) => {
-    const ideasArray = getAllFromDatabase('ideas');
-    res.send(ideasArray);
-  });
+ideasRouter.get('/', getAllFactory('ideas'));
 
 // POST /api/ideas to create a new idea and save it to the database.
 // Schema & data types are validated by addToDatabase() function.
