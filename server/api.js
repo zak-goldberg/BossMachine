@@ -5,7 +5,10 @@ const apiRouter = express.Router();
 const minionsRouter = require('./minions.js');
 apiRouter.use('/minions', minionsRouter);
 
-// remember to import and app.use all new routers
+// Import ideasRouter and use it for /api/ideas path
+const ideasRouter = require('./ideas.js');
+apiRouter.use('/ideas', ideasRouter);
 
+// remember to import and app.use all new routers
 
 module.exports = apiRouter;

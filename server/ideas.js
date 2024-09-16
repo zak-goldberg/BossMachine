@@ -1,16 +1,16 @@
 const express = require('express');
 
-// Create minionsRouter
+// Create ideasRouter
 const ideasRouter = express.Router();
 
 // Create a new stream to write to file in this directory
 const fs = require('fs');
 const path = require('path');
-const minionLogStream = fs.createWriteStream(path.join(__dirname, 'logs', 'minion-logs.txt'), { flags: 'a' });
+const ideasLogStream = fs.createWriteStream(path.join(__dirname, 'logs', 'ideas-logs.txt'));
 
 // Require in morgan
 const morgan = require('morgan');
-minionsRouter.use(morgan('common', { stream: minionLogStream }));
+ideasRouter.use(morgan('common', { stream: ideasLogStream }));
 
 // Import database helper functions
 const { getAllFromDatabase
@@ -28,8 +28,8 @@ const { getAllFromDatabase
 // DELETE /api/ideas/:ideaId to delete a single idea by id.
 
 // Generic error handler
-minionsRouter.use((err, req, res, next) => {
-    minionLogStream.write(`${err.name}: ${err.message} \n${err.fileName}: ${err.lineNumber} \n`);
+ideasRouter.use((err, req, res, next) => {
+    ideasLogStream.write(`${err.name}: ${err.message} \n${err.fileName}: ${err.lineNumber} \n`);
     res.status(404).send(err.message);
   });
 
