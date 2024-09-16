@@ -32,6 +32,7 @@ ideasRouter.get('/', (req, res, next) => {
 
 // POST /api/ideas to create a new idea and save it to the database.
 // Schema & data types are validated by addToDatabase() function.
+// Use checkMillionDollarIdea for value validation
 ideasRouter.post('/', checkMillionDollarIdea, (req, res, next) => {
     const newIdeaPayload = req.body;
     try {
@@ -43,12 +44,43 @@ ideasRouter.post('/', checkMillionDollarIdea, (req, res, next) => {
     }
   });
 
+// Middleware function to check if provided ideasId exists  
+  ideasRouter.param('ideaId', (req, res, next, id) => {
+    const requestedIdea = getFromDatabaseById('ideas', id);
+    if (requestedIdea) {
+      req.ideaId = id;
+      req.requestedIdea = requestedIdea;
+      next();
+    } else {
+      next(new Error('Please enter a valid idea id.'));
+    }
+  }); 
+
 // GET /api/ideas/:ideaId to get a single idea by id.
+ideasRouter.get('/:ideaId', (req, res, next) => { 
+    res.send(req.requestedIdea);
+  });
 
 // PUT /api/ideas/:ideaId to update a single idea by id.
-// use checkMillionDollarIdea
+// Use checkMillionDollarIdea for value validation
+ideasRouter.put('/:ideaId', checkMillionDollarIdea, (req, res, next) => {
+    try {
+      const updatedIdea = updateInstanceInDatabase('ideas', req.body);
+      res.send(updatedIdea);
+    } catch(err){
+      return next(err);
+    }
+  });
 
 // DELETE /api/ideas/:ideaId to delete a single idea by id.
+ideasRouter.delete('/:ideaId', (req, res, next) => {
+    const deletedIdea = deleteFromDatabasebyId('ideas', req.ideaId);
+    if (deletedIdea) {
+      res.status(204).send();
+    } else {
+      next(new Error('Please enter a valid ideaId'));
+    }
+  });
 
 // Generic error handler
 ideasRouter.use((err, req, res, next) => {
