@@ -41,10 +41,10 @@ function postFactory(type) {
         const postNewItem = (req, res, next) => {
             const newItemPayload = req.body;
             try {
-            const newItem = addToDatabase(type, newItemPayload);
-            res.status(201).send(newItem);
+                const newItem = addToDatabase(type, newItemPayload);
+                res.status(201).send(newItem);
             } catch(err) {
-            return next(err);
+                return next(err);
             }
         };
         return postNewItem;
@@ -92,12 +92,10 @@ function putFactory (type) {
 }
 
 // DELETE factory
-function deleteFactory (type) {
-    if (isValidType(type)) {
+function deleteFactory (type, deleteAll) {
+    if (isValidType(type) && deleteAll !== true) {
         const deleteItem = (req, res, next) => {
-            factoryLogStream.write('Made it into deleteFactory function. \n');
             const deletedItem = deleteFromDatabasebyId(type, req.requestedItemId);
-            factoryLogStream.write(`deletedItem: ${deletedItem} \n`);
             if (deletedItem) {
               res.status(204).send();
             } else {
@@ -105,7 +103,18 @@ function deleteFactory (type) {
             }
           };
         return deleteItem;
-    } else {
+    } else if (isValidType(type) && deleteAll === true) {
+        const deleteAllItems = (req, res, next) => {
+            const deletedArray = deleteAllFromDatabase(type);
+            if (deletedArray) {
+              res.status(204).send();
+            } else {
+              next(new Error('Delete failed for some reason. Please try again.'));
+            }
+          };
+        return deleteAllItems;        
+    }
+    else {
         return(new Error('Please provide a valid type'));
     }
 }
