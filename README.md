@@ -10,6 +10,7 @@ My solution to the Codecademy Boss Machine project. This repo only includes the 
 - Practice creating routers and writing routes in **Express.JS**
 - Practice writing **factory functions**:
   - This wasn't in the spec but the callback functions for GET, POST, PUT, and DELETE routes were the same across the /api/meetings, /api/minions, and /api/ideas routes, so I thought it would be a good oppourtunity to practice this.
+- Practice using git: branching, PRs, merging, etc.
 
 ## Roadblocks:
 Some tests in the test file provided by CodeAcademy required some troubleshooting and updating the test script: more details [here](https://discuss.codecademy.com/t/boss-machine-post-api-meetings-test-failures-fix/840420).
