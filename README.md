@@ -7,7 +7,7 @@ My solution to the Codecademy Boss Machine project. This repo only includes the 
 
 ## Learning Goals:
 - Practice using **Node.JS**
-- Practices creating routers and writing routes in **Express.JS**
+- Practice creating routers and writing routes in **Express.JS**
 - Practice writing **factory functions**:
   - This wasn't in the spec but the callback functions for GET, POST, PUT, and DELETE routes were the same across the /api/meetings, /api/minions, and /api/ideas routes, so I thought it would be a good oppourtunity to practice this.
 
