@@ -45,4 +45,5 @@ minionsRouter.delete('/:minionId', deleteFactory('minions'));
 const genericErrorHandler = require('./generic-error-handler.js');
 minionsRouter.use(genericErrorHandler);
 
+// Export the router as a module
 module.exports = minionsRouter;

@@ -15,8 +15,6 @@ meetingsRouter.use(morgan('common', { stream: meetingsLogStream }));
 // Import route factories
 const { getAllFactory
     , postFactory
-    , checkIfValidItem 
-    , putFactory 
     , deleteFactory } 
     = require('./route-factories.js');
 
@@ -29,4 +27,9 @@ meetingsRouter.post('/', postFactory('meetings'));
 // DELETE /api/meetings to delete _all_ meetings from the database.
 meetingsRouter.delete('/', deleteFactory('meetings', true));
 
+// Generic error handler
+const genericErrorHandler = require('./generic-error-handler.js');
+meetingsRouter.use(genericErrorHandler);
+
+// Export the router as a module
 module.exports = meetingsRouter;

@@ -50,4 +50,5 @@ ideasRouter.delete('/:ideaId', deleteFactory('ideas'));
 const genericErrorHandler = require('./generic-error-handler.js');
 ideasRouter.use(genericErrorHandler);
 
+// Export the router as a module
 module.exports = ideasRouter;

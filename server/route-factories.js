@@ -13,16 +13,16 @@ const fs = require('fs');
 const path = require('path');
 const factoryLogStream = fs.createWriteStream(path.join(__dirname, 'logs', 'factory-logs.txt'));
 
-// Require in morgan
-const morgan = require('morgan');
-
-// Valid types array
+// isValidType take a `type` as input and
+// checks if it is one of valid "types" accepted by the DB
+// returns true if so, false if not
 function isValidType(type) {
     const validTypes = ['minions', 'ideas', 'meetings', 'work'];
     return validTypes.includes(type);
 }
 
-// GET all factory
+// getAllFactory, given an input `type` 
+// returns a callback function that gets all items in the DB 
 function getAllFactory(type) {
     if (isValidType(type)) {
         const getAllItems = (req, res, next) => {
@@ -35,7 +35,8 @@ function getAllFactory(type) {
     }
 }
 
-// POST factory
+// postFactory, given an input `type` 
+// returns a callback function that creates a new item in the DB
 function postFactory(type) {
     if (isValidType(type)) {
         const postNewItem = (req, res, next) => {
@@ -53,14 +54,14 @@ function postFactory(type) {
     }
 }
 
-// checkIfValidItems factory
+// checkIfValidItems factory, given a valid `type`
+// returns a middleware function that checks the DB 
+// to see if an item with the provided id exists
 function checkIfValidItem (type) {
     if (isValidType(type)) {
         const isValidItem = (req, res, next, id) => {
             const requestedItem = getFromDatabaseById(type, id);
-            factoryLogStream.write(`JSON.stringify(requestedItem): ${JSON.stringify(requestedItem)} \n`);
             if (requestedItem) {
-              factoryLogStream.write('Made it into the requestedItem if statement. \n');
               req.requestedItemId = id;
               req.requestedItem = requestedItem;
               next();
@@ -74,7 +75,8 @@ function checkIfValidItem (type) {
     }  
 }
 
-// PUT factory
+// PUT factory, given an input `type`
+// returns a callback function that creates a new item in the DB
 function putFactory (type) {
     if (isValidType(type)) {
         const putItem = (req, res, next) => {
@@ -91,7 +93,10 @@ function putFactory (type) {
     }  
 }
 
-// DELETE factory
+// DELETE factory, given an input `type`
+// returns a callback function that deletes an item from the DB
+// optional parameter deleteAll: if true, creates a callback function that
+// deletes all items from the DB
 function deleteFactory (type, deleteAll) {
     if (isValidType(type) && deleteAll !== true) {
         const deleteItem = (req, res, next) => {
@@ -119,6 +124,7 @@ function deleteFactory (type, deleteAll) {
     }
 }
 
+// Export the factory functions as modules
 module.exports.getAllFactory = getAllFactory;
 module.exports.postFactory = postFactory;
 module.exports.checkIfValidItem = checkIfValidItem;
