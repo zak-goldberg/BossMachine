@@ -14,7 +14,7 @@ My solution to the Codecademy Boss Machine project. This repo only includes the 
 
 ## Roadblocks & Learnings:
 1. \[Roadblock\] Some tests in the test file provided by CodeAcademy required some troubleshooting and updating the test script: more details [here](https://discuss.codecademy.com/t/boss-machine-post-api-meetings-test-failures-fix/840420).
-2. \[Learning\] In the below snippet, `app` is an Express app. `router1` is mounted to `app` for the path `/api/stuff/:stuffId`. A GET route is registered to `router1` for `/`. If a call is made to `GET /api/stuff/:stuffId` a `.param('stuffId', ...)` call would get executed for `app` but not `router1` because `router1` is not "aware" of the `stuffId` parameter since the request is routed from `app`. I made a false assumption that `router1.param('stuffId', ...)` would get invoked in this scenario which caused me a lot of pain and troubleshooting time... 🤦🏻
+2. \[Learning\] In the below snippet, `app` is an Express app. `router1` is mounted to `app` for the path `/api/stuff/:stuffId`. A GET route is registered to `router1` for `/`. If a call is made to `GET /api/stuff/:stuffId`, a `.param('stuffId', ...)` call would get executed for `app` but not `router1` because `router1` is not "aware" of the `stuffId` parameter since the request is routed from `app`. I made a false assumption that `router1.param('stuffId', ...)` would get invoked in this scenario which caused me a lot of pain and troubleshooting time... 🤦🏻
 ``` JS
 const express = require('express');
 const app = express();
