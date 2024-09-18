@@ -1,5 +1,16 @@
 const express = require('express');
+
+// Create minionsRouter
 const minionsRouter = express.Router();
+
+// Create a new stream to write to file in this directory
+const fs = require('fs');
+const path = require('path');
+const minionLogStream = fs.createWriteStream(path.join(__dirname, 'logs', 'minion-logs.txt'), { flags: 'a' });
+
+// Require in morgan
+const morgan = require('morgan');
+minionsRouter.use(morgan('common', { stream: minionLogStream }));
 
 // Import database helper functions
 const { getAllFromDatabase
@@ -20,12 +31,14 @@ minionsRouter.get('/', (req, res, next) => {
 // Schema & data types are validated by addToDatabase() function.
 minionsRouter.post('/', (req, res, next) => {
   const newMinionPayload = req.body;
+  minionLogStream.write(`newMinionPayload: ${JSON.stringify(newMinionPayload)} \n`);
   try {
     const newMinion = addToDatabase('minions', newMinionPayload);
+    minionLogStream.write(`newMinion: ${JSON.stringify(newMinion)} \n`);
+    res.status(201).send(newMinion);
   } catch(err) {
     return next(err);
   }
-  res.send(newMinion);
 });
 
 // Middleware function to check if provided minionId exists and throw an error if not
@@ -48,11 +61,11 @@ minionsRouter.get('/:minionId', (req, res, next) => {
 // PUT /api/minions/:minionId to update a single minion by id.
 minionsRouter.put('/:minionId', (req, res, next) => {
   try {
-    const updatedMinion = updateInstanceInDatabase('minions', req.requestedMinion);
+    const updatedMinion = updateInstanceInDatabase('minions', req.body);
+    res.send(updatedMinion);
   } catch(err){
     return next(err);
   }
-  res.send(updatedMinion);
 });
 
 // DELETE /api/minions/:minionId to delete a single minion by id.
@@ -66,8 +79,9 @@ minionsRouter.delete('/:minionId', (req, res, next) => {
 });
 
 // Generic error handler
-app.use((err, req, res, next) => {
-  res.status(400).res.send(err.message);
+minionsRouter.use((err, req, res, next) => {
+  minionLogStream.write(`${err.name}: ${err.message} \n${err.fileName}: ${err.lineNumber} \n`);
+  res.status(404).send(err.message);
 });
 
 module.exports = minionsRouter;
